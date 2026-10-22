@@ -1,3 +1,5 @@
+using Dueto.Core.Catalog;
+using Dueto.Infrastructure.Catalog;
 using Dueto.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +26,8 @@ public static class InfrastructureServiceCollectionExtensions
             var database = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
             options.UseNpgsql(database.ConnectionString);
         });
+
+        services.AddScoped<IWallpaperCatalog, WallpaperCatalog>();
 
         return services;
     }

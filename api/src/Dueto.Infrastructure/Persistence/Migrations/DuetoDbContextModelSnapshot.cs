@@ -297,6 +297,45 @@ namespace Dueto.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("wallpapers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "aurora-dunes",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 1, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DesktopSha256 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                            DesktopUrl = "https://example.com/wallpapers/aurora-dunes-desktop.png",
+                            Kind = "Static",
+                            MobileSha256 = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+                            MobileUrl = "https://example.com/wallpapers/aurora-dunes-mobile.png",
+                            Tags = new[] { "landscape", "dark" },
+                            ThumbnailUrl = "https://example.com/wallpapers/aurora-dunes-thumb.jpg",
+                            Title = "Aurora Dunes"
+                        },
+                        new
+                        {
+                            Id = "neon-tide",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 2, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DesktopSha256 = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+                            DesktopUrl = "https://example.com/wallpapers/neon-tide-desktop.png",
+                            Kind = "Static",
+                            MobileSha256 = "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+                            MobileUrl = "https://example.com/wallpapers/neon-tide-mobile.png",
+                            Tags = new[] { "abstract", "vibrant" },
+                            ThumbnailUrl = "https://example.com/wallpapers/neon-tide-thumb.jpg",
+                            Title = "Neon Tide"
+                        },
+                        new
+                        {
+                            Id = "drift-loop",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 3, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DesktopSha256 = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                            DesktopUrl = "https://example.com/wallpapers/drift-loop-desktop.mp4",
+                            Kind = "Animated",
+                            Tags = new[] { "animated", "calm" },
+                            ThumbnailUrl = "https://example.com/wallpapers/drift-loop-thumb.jpg",
+                            Title = "Drift Loop"
+                        });
                 });
 
             modelBuilder.Entity("Dueto.Core.Domain.Device", b =>

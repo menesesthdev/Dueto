@@ -19,6 +19,7 @@ app.UseExceptionHandler();
 app.UseStatusCodePages();
 
 app.MapHealthEndpoints();
+app.MapWallpaperEndpoints();
 
 app.Run();
 
