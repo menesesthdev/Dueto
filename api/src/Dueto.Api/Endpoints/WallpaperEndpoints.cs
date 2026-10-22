@@ -1,3 +1,4 @@
+using Dueto.Api.Security;
 using Dueto.Core.Catalog;
 
 namespace Dueto.Api.Endpoints;
@@ -7,7 +8,8 @@ public static class WallpaperEndpoints
 {
     public static IEndpointRouteBuilder MapWallpaperEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/wallpapers");
+        var group = app.MapGroup("/api/wallpapers")
+            .RequireRateLimiting(RateLimitingOptions.PublicPolicyName);
 
         group.MapGet("/", async (IWallpaperCatalog catalog, CancellationToken cancellationToken) =>
             Results.Ok(await catalog.ListAsync(cancellationToken)));
