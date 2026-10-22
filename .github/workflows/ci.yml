@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  api:
+    name: API (build + test + lint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore api/Dueto.slnx
+
+      - name: Build (warnings as errors)
+        run: dotnet build api/Dueto.slnx --no-restore -c Release -warnaserror
+
+      - name: Test
+        run: dotnet test api/Dueto.slnx --no-build -c Release --verbosity normal
+
+      - name: Lint (dotnet format)
+        run: dotnet format api/Dueto.slnx --verify-no-changes --no-restore

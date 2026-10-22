@@ -1,0 +1,30 @@
+# Docs técnicas de sessão (privadas, não versionadas)
+sessoes/
+
+# .NET
+bin/
+obj/
+*.user
+[Bb]in/
+[Oo]bj/
+.vs/
+
+# Testes / cobertura
+[Tt]est[Rr]esult*/
+coverage/
+*.trx
+
+# Node
+node_modules/
+dist/
+.angular/
+
+# Ambiente / segredos
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+
+# Sistema
+.DS_Store
+Thumbs.db

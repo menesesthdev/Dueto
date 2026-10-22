@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Dueto.Api/Dueto.Api.csproj" />
+    <Project Path="src/Dueto.Core/Dueto.Core.csproj" />
+    <Project Path="src/Dueto.Infrastructure/Dueto.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Dueto.Tests/Dueto.Tests.csproj" />
+  </Folder>
+</Solution>

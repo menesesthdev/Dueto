@@ -1,0 +1,38 @@
+# Ambiente de desenvolvimento: sobe SÓ as dependências (o Postgres).
+# A API roda no host via `dotnet run`, por isso aqui a porta é publicada.
+# Em produção o banco NÃO publica porta (ver docker-compose.prod.yml, fase 6).
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dueto-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dueto
+      POSTGRES_PASSWORD: dueto # credencial local descartável, só para dev
+      POSTGRES_DB: dueto
+    ports:
+      - "5432:5432"
+    volumes:
+      - dueto_pgdata_dev:/var/lib/postgresql/data
+    # Postgres enxuto para pouca memória (a EC2 de produção tem 1 GB).
+    command:
+      - postgres
+      - "-c"
+      - "max_connections=20"
+      - "-c"
+      - "shared_buffers=64MB"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dueto -d dueto"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    mem_limit: 256m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  dueto_pgdata_dev:
+    name: dueto_pgdata_dev

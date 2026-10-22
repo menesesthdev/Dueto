@@ -1,0 +1,26 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+[*.{cs,csx}]
+indent_size = 4
+
+# Preferências de estilo C# verificadas no CI por `dotnet format`.
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_using_directive_placement = outside_namespace:warning
+dotnet_sort_system_directives_first = true
+csharp_prefer_braces = true:silent
+
+[*.{json,yml,yaml,csproj,props,targets,slnx}]
+indent_size = 2
+
+[*.{js,ts,html,css,scss}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
