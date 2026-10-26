@@ -1,6 +1,10 @@
 using Dueto.Core.Catalog;
+using Dueto.Core.Pairing;
+using Dueto.Core.State;
 using Dueto.Infrastructure.Catalog;
+using Dueto.Infrastructure.Pairing;
 using Dueto.Infrastructure.Persistence;
+using Dueto.Infrastructure.State;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,7 +31,16 @@ public static class InfrastructureServiceCollectionExtensions
             options.UseNpgsql(database.ConnectionString);
         });
 
+        services
+            .AddOptions<PairingOptions>()
+            .Bind(configuration.GetSection(PairingOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services.AddScoped<IWallpaperCatalog, WallpaperCatalog>();
+        services.AddScoped<IPairingService, PairingService>();
+        services.AddScoped<IDeviceAuthenticator, DeviceAuthenticator>();
+        services.AddScoped<IStateService, StateService>();
 
         return services;
     }

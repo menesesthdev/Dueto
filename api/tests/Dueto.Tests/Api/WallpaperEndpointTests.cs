@@ -6,7 +6,8 @@ using Dueto.Tests.Infrastructure;
 namespace Dueto.Tests.Api;
 
 /// <summary>Testes de integração do catálogo, contra um Postgres real em container.</summary>
-public class WallpaperEndpointTests : IClassFixture<PostgresApiFactory>
+[Collection(PostgresCollection.Name)]
+public class WallpaperEndpointTests
 {
     private readonly HttpClient _client;
 

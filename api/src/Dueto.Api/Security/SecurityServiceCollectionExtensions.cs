@@ -34,7 +34,7 @@ public static class SecurityServiceCollectionExtensions
                 cors.AddPolicy(CorsPolicyOptions.PolicyName, builder => builder
                     .WithOrigins(policy.Value.AllowedOrigins)
                     .WithMethods("GET", "POST", "PUT", "DELETE")
-                    .WithHeaders("Authorization", "Content-Type"));
+                    .WithHeaders("Authorization", "Content-Type", "X-SignalR-User-Agent"));
             });
 
         services.AddRateLimiter(_ => { });
@@ -53,6 +53,29 @@ public static class SecurityServiceCollectionExtensions
                             QueueLimit = 0,
                         }));
 
+                limiter.AddPolicy(RateLimitingOptions.PairingPolicyName, httpContext =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = settings.Value.PairingPermitLimit,
+                            Window = TimeSpan.FromSeconds(settings.Value.PairingWindowSeconds),
+                            QueueLimit = 0,
+                        }));
+
+                // Uma única janela para todos os IPs, só em pairing/complete.
+                limiter.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                    IsPairingComplete(httpContext.Request)
+                        ? RateLimitPartition.GetFixedWindowLimiter(
+                            "pairing-complete-global",
+                            _ => new FixedWindowRateLimiterOptions
+                            {
+                                PermitLimit = settings.Value.PairingCompleteGlobalPermitLimit,
+                                Window = TimeSpan.FromSeconds(settings.Value.PairingWindowSeconds),
+                                QueueLimit = 0,
+                            })
+                        : RateLimitPartition.GetNoLimiter("none"));
+
                 limiter.OnRejected = async (context, cancellationToken) =>
                 {
                     if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
@@ -69,4 +92,8 @@ public static class SecurityServiceCollectionExtensions
 
         return services;
     }
+
+    private static bool IsPairingComplete(HttpRequest request) =>
+        HttpMethods.IsPost(request.Method)
+        && request.Path.Value?.TrimEnd('/').Equals("/api/pairing/complete", StringComparison.OrdinalIgnoreCase) == true;
 }
