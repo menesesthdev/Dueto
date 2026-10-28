@@ -1,0 +1,507 @@
+// Mobile first. O layout de duas colunas (desktop) entra com a classe .pairing--wide.
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+.pairing {
+  display: flex;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: calc(var(--safe-top) + 16px) 20px calc(var(--safe-bottom) + 24px);
+}
+
+.pairing--wide {
+  align-items: center;
+  padding: 40px;
+}
+
+// ---- Peças comuns ---------------------------------------------------------------------------------
+
+.brand {
+  align-items: center;
+  display: flex;
+  gap: 9px;
+  padding: 4px 2px;
+}
+
+.brand__name {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+}
+
+.eyebrow {
+  color: var(--color-azure);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-heavy);
+  letter-spacing: var(--tracking-tight);
+  line-height: 1.1;
+}
+
+.title--center,
+.lead--center {
+  text-align: center;
+}
+
+.lead {
+  color: var(--color-gray-600);
+  font-size: var(--text-body);
+  line-height: 22px;
+
+  strong {
+    color: var(--color-ink);
+    font-weight: var(--weight-semibold);
+  }
+}
+
+.error {
+  align-items: flex-start;
+  color: var(--color-danger-ink);
+  display: flex;
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  gap: 9px;
+  line-height: 18px;
+  padding: 2px 2px 0;
+
+  dt-icon {
+    color: var(--color-danger);
+    margin-top: 1px;
+  }
+}
+
+.btn {
+  align-items: center;
+  border: 0;
+  border-radius: var(--radius-md);
+  display: flex;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  gap: 9px;
+  height: 54px;
+  justify-content: center;
+  letter-spacing: var(--tracking-snug);
+  width: 100%;
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.42;
+  }
+}
+
+.btn--primary {
+  background: var(--gradient-brand);
+  box-shadow: var(--shadow-button);
+  color: var(--color-white);
+
+  &:disabled {
+    box-shadow: none;
+  }
+}
+
+.btn--light {
+  background: var(--color-white);
+  box-shadow: 0 6px 16px -6px rgb(0 0 0 / 30%);
+  color: var(--color-navy);
+  font-size: var(--text-body);
+  height: 44px;
+}
+
+.link {
+  align-items: center;
+  background: none;
+  border: 0;
+  border-radius: var(--radius-xs);
+  color: var(--color-gray-600);
+  display: inline-flex;
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  gap: 7px;
+  padding: 6px 2px;
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+}
+
+.link--strong {
+  color: var(--color-navy);
+  font-weight: var(--weight-semibold);
+}
+
+.link--center {
+  align-self: center;
+  color: var(--color-navy);
+  font-weight: var(--weight-semibold);
+}
+
+// ---- Inserir código (celular) ---------------------------------------------------------------------
+
+.enter,
+.done {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 420px;
+  width: 100%;
+}
+
+.enter__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 26px 2px 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding-top: 12px;
+}
+
+.field__label {
+  color: var(--color-gray-600);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  padding-left: 2px;
+  text-transform: uppercase;
+}
+
+.field__control {
+  align-items: center;
+  background: var(--color-white);
+  border: 1px solid var(--color-fog-300);
+  border-radius: var(--radius-md);
+  color: var(--color-azure);
+  display: flex;
+  gap: 10px;
+  height: 48px;
+  padding: 0 14px;
+
+  &:focus-within {
+    border-color: var(--color-azure);
+    box-shadow: 0 0 0 4px rgb(46 127 214 / 20%);
+  }
+
+  input {
+    background: none;
+    border: 0;
+    color: var(--color-ink);
+    flex: 1;
+    font-size: var(--text-body);
+    font-weight: var(--weight-medium);
+    min-width: 0;
+    outline: none;
+  }
+}
+
+.enter__spacer {
+  flex: 1;
+  min-height: 24px;
+}
+
+.enter__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+// ---- Par conectado --------------------------------------------------------------------------------
+
+.done__body {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 18px;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.done__pair {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  padding-bottom: 4px;
+}
+
+.done__tile {
+  align-items: center;
+  background: var(--color-white);
+  border: 1px solid var(--color-fog-200);
+  border-radius: 20px;
+  box-shadow: 0 10px 24px -12px rgb(10 42 74 / 14%);
+  color: var(--color-navy);
+  display: flex;
+  height: 64px;
+  justify-content: center;
+  width: 64px;
+}
+
+.done__tile--phone {
+  color: var(--color-azure);
+}
+
+.done__check {
+  align-items: center;
+  background: var(--gradient-brand);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 8px 16px -6px rgb(10 77 140 / 35%);
+  color: var(--color-white);
+  display: flex;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.status-pill {
+  align-items: center;
+  background: var(--color-mint-soft);
+  border-radius: var(--radius-pill);
+  color: var(--color-mint-ink);
+  display: inline-flex;
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  gap: 7px;
+  padding: 5px 11px 5px 9px;
+}
+
+.status-pill__dot {
+  background: var(--color-mint);
+  border-radius: var(--radius-pill);
+  height: 6px;
+  width: 6px;
+}
+
+.pairing--wide .done {
+  min-height: 560px;
+}
+
+// ---- Gerar código ---------------------------------------------------------------------------------
+
+.generate {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 420px;
+  width: 100%;
+}
+
+.generate__text {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.generate__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.links {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+}
+
+.pairing--wide .generate {
+  background: rgb(255 255 255 / 86%);
+  border: 1px solid rgb(255 255 255 / 70%);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-window);
+  flex-direction: row;
+  gap: 0;
+  height: 588px;
+  max-width: 900px;
+  overflow: clip;
+}
+
+.pairing--wide .generate__text {
+  flex-shrink: 0;
+  justify-content: space-between;
+  padding: 32px 20px 32px 44px;
+  width: 410px;
+}
+
+.pairing--wide .title {
+  font-size: 36px;
+  line-height: 40px;
+}
+
+.pairing--wide .code-card {
+  flex: 1;
+  margin: 28px 28px 28px 8px;
+  min-height: 0;
+}
+
+// O cartão do código é o único momento de cor forte da tela.
+.code-card {
+  background: var(--gradient-hero);
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 24px 48px -22px rgb(10 42 74 / 55%);
+  color: var(--color-white);
+  display: flex;
+  flex-direction: column;
+  min-height: 380px;
+  overflow: clip;
+  position: relative;
+}
+
+.code-card__glow {
+  background: radial-gradient(circle, rgb(255 255 255 / 25%) 0%, transparent 65%);
+  border-radius: var(--radius-pill);
+  height: 240px;
+  pointer-events: none;
+  position: absolute;
+  right: -50px;
+  top: -60px;
+  width: 240px;
+}
+
+.code-card__state {
+  align-items: center;
+  backdrop-filter: blur(8px);
+  background: rgb(255 255 255 / 18%);
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  gap: 7px;
+  left: 20px;
+  letter-spacing: var(--tracking-wide);
+  padding: 5px 11px 5px 8px;
+  position: absolute;
+  text-transform: uppercase;
+  top: 20px;
+}
+
+.code-card__dot {
+  background: #4ef08a;
+  border-radius: var(--radius-pill);
+  height: 6px;
+  width: 6px;
+}
+
+.code-card--expired .code-card__dot {
+  background: #ffb020;
+}
+
+.code-card__center {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 18px;
+  justify-content: center;
+  padding: 72px 16px 16px;
+}
+
+.code-card__label {
+  color: rgb(255 255 255 / 88%);
+  font-size: 12px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.code-card__digits {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.code-card__digit {
+  align-items: center;
+  background: rgb(255 255 255 / 12%);
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: var(--radius-md);
+  display: flex;
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: var(--weight-heavy);
+  height: 60px;
+  justify-content: center;
+  letter-spacing: var(--tracking-tight);
+  width: 42px;
+}
+
+.code-card__digit--empty {
+  opacity: 0.5;
+}
+
+.code-card__dash {
+  background: rgb(255 255 255 / 40%);
+  border-radius: 2px;
+  height: 3px;
+  width: 10px;
+}
+
+.code-card--expired .code-card__digits {
+  opacity: 0.4;
+}
+
+.code-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 0 24px 24px;
+}
+
+.code-card__time {
+  color: rgb(255 255 255 / 85%);
+  display: flex;
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  justify-content: space-between;
+
+  strong {
+    color: var(--color-white);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--weight-bold);
+  }
+}
+
+.code-card__bar {
+  background: rgb(255 255 255 / 20%);
+  border-radius: var(--radius-pill);
+  height: 4px;
+  overflow: clip;
+}
+
+.code-card__fill {
+  background: var(--color-white);
+  border-radius: var(--radius-pill);
+  display: block;
+  height: 100%;
+  transition: width 1s linear;
+}
+
+@media (min-width: 834px) {
+  .code-card__digits {
+    gap: 8px;
+  }
+
+  .code-card__digit {
+    font-size: 42px;
+    height: 72px;
+    width: 50px;
+  }
+}

@@ -63,7 +63,7 @@ Não é afiliado ao Wallpaper Engine. Nunca use o nome, a marca ou o sufixo "Eng
 - **Angular** (versão estável atual, ver `apps/web/package.json`), `@angular/pwa`
 - **Electron** (estável atual), TypeScript
 - **PostgreSQL 16**
-- **Node.js LTS**
+- **Node.js LTS** (24, exigido pelo Angular 22; o Angular aceita `^22.22.3 || ^24.15.0 || >=26`)
 - **Docker + Docker Compose**, **Caddy 2**
 - Versões fixadas em `.tool-versions` (asdf). Instale dependências de desenvolvimento via asdf quando possível.
 
@@ -106,7 +106,8 @@ Sempre indique a pasta ao pedir para o dono rodar.
 | Nova migration | raiz | `dotnet ef migrations add <Nome> -p api/src/Dueto.Infrastructure -s api/src/Dueto.Api` | arquivo gerado e revisado; nenhum `DROP` inesperado |
 | Aplicar migrations | raiz | `dotnet ef database update -p api/src/Dueto.Infrastructure -s api/src/Dueto.Api` | tabelas criadas no banco |
 | Rodar o PWA | `apps/web` | `npm start` | `http://localhost:4200` abre |
-| Testes do PWA | `apps/web` | `npm test` | todos passam |
+| Testes do PWA | `apps/web` | `npm test -- --watch=false` | todos passam (Vitest) |
+| Lint do PWA | `apps/web` | `npx ng lint` | `All files pass linting.` |
 | Rodar o desktop | `apps/desktop` | `npm start` | janela abre e ícone aparece na bandeja |
 | Chaves VAPID | qualquer | `npx web-push generate-vapid-keys` | par de chaves exibido |
 

@@ -1,0 +1,109 @@
+<main class="pairing" [class.pairing--wide]="wide()">
+  @if (flow.phase() === 'connected') {
+    <section class="done" aria-labelledby="done-title">
+      <header class="brand"><dt-logo-mark [size]="26" /><span class="brand__name">Dueto</span></header>
+
+      <div class="done__body">
+        <div class="done__pair" aria-hidden="true">
+          <span class="done__tile"><dt-icon name="monitor" [size]="30" [stroke]="1.8" /></span>
+          <span class="done__check"><dt-icon name="check" [size]="18" [stroke]="2.8" /></span>
+          <span class="done__tile done__tile--phone"><dt-icon name="phone" [size]="30" [stroke]="1.8" /></span>
+        </div>
+        <h1 id="done-title" class="title title--center">Par conectado</h1>
+        <p class="lead lead--center">Seus aparelhos agora trocam de wallpaper em sincronia.</p>
+        <span class="status-pill"><span class="status-pill__dot"></span>{{ partnerLabel() }} · conectado</span>
+      </div>
+
+      <button type="button" class="btn btn--primary" (click)="goToCatalog()">Ver catálogo</button>
+    </section>
+  } @else if (flow.mode() === 'generate') {
+    <section class="generate" aria-labelledby="generate-title">
+      <div class="generate__text">
+        <header class="brand"><dt-logo-mark [size]="30" /><span class="brand__name">Dueto</span></header>
+
+        <div class="generate__copy">
+          <p class="eyebrow">Parear com o iPhone</p>
+          <h1 id="generate-title" class="title">Digite este código no seu iPhone</h1>
+          <p class="lead">
+            Abra o Dueto no iPhone, toque em <strong>Inserir código</strong> e digite os 6 dígitos. O código vale por 5 minutos e
+            só funciona uma vez.
+          </p>
+          @if (flow.error(); as message) {
+            <p class="error" role="alert"><dt-icon name="warning" [size]="16" />{{ message }}</p>
+          }
+        </div>
+
+        <nav class="links" aria-label="Outras opções de pareamento">
+          <button type="button" class="link link--strong" (click)="flow.generate()" [disabled]="working()">
+            <dt-icon name="refresh" [size]="15" />Gerar novo código
+          </button>
+          <button type="button" class="link" (click)="flow.switchMode('enter')">Já tenho um código</button>
+        </nav>
+      </div>
+
+      <div class="code-card" [class.code-card--expired]="flow.expired()">
+        <div class="code-card__glow"></div>
+        <span class="code-card__state">
+          <span class="code-card__dot"></span>{{ flow.expired() ? 'Código expirado' : working() ? 'Gerando código' : 'Aguardando o iPhone' }}
+        </span>
+
+        <div class="code-card__center">
+          <p class="code-card__label">Seu código</p>
+          <div class="code-card__digits" role="img" [attr.aria-label]="'Código ' + digits().join(' ')">
+            @for (digit of digits(); track $index) {
+              @if ($index === 3) {
+                <span class="code-card__dash"></span>
+              }
+              <span class="code-card__digit">{{ digit }}</span>
+            } @empty {
+              @for (placeholder of [0, 1, 2, 3, 4, 5]; track placeholder) {
+                <span class="code-card__digit code-card__digit--empty"></span>
+              }
+            }
+          </div>
+        </div>
+
+        <div class="code-card__footer">
+          @if (flow.expired()) {
+            <button type="button" class="btn btn--light" (click)="flow.generate()">Gerar novo código</button>
+          } @else {
+            <div class="code-card__time">
+              <span>Expira em</span><strong>{{ countdown() }}</strong>
+            </div>
+            <div class="code-card__bar"><span class="code-card__fill" [style.width.%]="flow.fractionLeft() * 100"></span></div>
+          }
+        </div>
+      </div>
+    </section>
+  } @else {
+    <form class="enter" (submit)="$event.preventDefault(); submit()" aria-labelledby="enter-title" novalidate>
+      <header class="brand"><dt-logo-mark [size]="26" /><span class="brand__name">Dueto</span></header>
+
+      <div class="enter__heading">
+        <h1 id="enter-title" class="title">Inserir código</h1>
+        <p class="lead">Digite os {{ codeLength }} dígitos que aparecem no Dueto do seu PC.</p>
+      </div>
+
+      <dt-otp-input [(value)]="typedCode" [disabled]="working()" [invalid]="!!flow.error()" />
+
+      @if (flow.error(); as message) {
+        <p class="error" role="alert"><dt-icon name="warning" [size]="16" />{{ message }}</p>
+      }
+
+      <label class="field">
+        <span class="field__label">Nome deste aparelho</span>
+        <span class="field__control">
+          <dt-icon name="phone" [size]="16" />
+          <input type="text" [value]="deviceName()" (input)="onNameInput($event)" [maxLength]="maxNameLength" autocomplete="off" />
+        </span>
+      </label>
+
+      <div class="enter__spacer"></div>
+
+      <div class="enter__actions">
+        <button type="submit" class="btn btn--primary" [disabled]="!canSubmit()">{{ working() ? 'Pareando…' : 'Parear' }}</button>
+        <button type="button" class="link link--center" (click)="flow.switchMode('generate')">Gerar um código neste aparelho</button>
+      </div>
+    </form>
+  }
+</main>

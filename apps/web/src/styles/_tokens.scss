@@ -1,0 +1,86 @@
+// Tokens do Dueto — paleta Tidal ("Marinho & Névoa", light).
+// Os valores vêm dos nós do protótipo no Paper. Os tokens do arquivo do Paper ainda têm o acento violeta
+// antigo (#5B43F0) e não devem ser usados; as sombras também são tingidas de marinho, não de violeta.
+:root {
+  // Marca
+  --color-navy: #0a4d8c;
+  --color-azure: #2e7fd6;
+  --color-ice: #5ac8fa;
+  --color-deep: #0a2a4a;
+  --color-ink: #0b0b0f;
+
+  // Superfícies e neutros
+  --color-mist: #eef3f8;
+  --color-sky-soft: #e2ecf6;
+  --color-white: #ffffff;
+  --color-fog-50: #f7f8fb;
+  --color-fog-100: #eef0f5;
+  --color-fog-200: #e2e5ec;
+  --color-fog-300: #d3d7e0;
+  --color-gray-400: #a7acba;
+  --color-gray-500: #787e8c;
+  --color-gray-600: #565b68;
+  --color-gray-700: #3a3e49;
+
+  // Estados
+  --color-mint: #30d158;
+  --color-mint-ink: #1a7f37;
+  --color-mint-soft: rgb(48 209 88 / 12%);
+  --color-danger: #d92d20;
+  --color-danger-ink: #b42318;
+  --color-danger-soft: #fff5f4;
+
+  // Gradientes
+  --gradient-brand: linear-gradient(135deg, #0a4d8c 0%, #2e7fd6 100%);
+  --gradient-logo: linear-gradient(150deg, #0f3a66 0%, #0a2a4a 100%);
+  --gradient-hero: radial-gradient(ellipse 130% 120% at 15% 10%, #3e9bde 0%, #1e6fc0 42%, #0a3e78 80%, #0a2a5a 100%);
+  --gradient-page: linear-gradient(160deg, #eef3f8 0%, #e5ecf3 55%, #f0f5f9 100%);
+
+  // Tipografia. -apple-system resolve para SF Pro nos aparelhos Apple; a Inter cobre Windows e Android.
+  --font-display: -apple-system, blinkmacsystemfont, 'SF Pro Display', 'Inter Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-text: -apple-system, blinkmacsystemfont, 'SF Pro Text', 'Inter Variable', 'Segoe UI', system-ui, sans-serif;
+  --text-caption: 11px;
+  --text-small: 13px;
+  --text-body: 15px;
+  --text-base: 17px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --text-3xl: 44px;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-heavy: 800;
+  --tracking-tight: -0.02em;
+  --tracking-snug: -0.01em;
+  --tracking-wide: 0.04em;
+  --tracking-caps: 0.08em;
+
+  // Espaçamento e raios
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --radius-xs: 8px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  // Sombras (tingidas de marinho)
+  --shadow-card: 0 8px 18px -10px rgb(10 42 74 / 60%);
+  --shadow-hero: 0 18px 40px -18px rgb(10 42 74 / 55%);
+  --shadow-window: 0 40px 90px -30px rgb(10 42 74 / 38%), 0 8px 24px -12px rgb(10 42 74 / 22%);
+  --shadow-button: 0 12px 24px -10px rgb(10 77 140 / 55%);
+  --ring-focus: 0 0 0 3px rgb(46 127 214 / 40%);
+
+  // Áreas seguras do iPhone (notch e barra inferior). Zero fora do iOS.
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}

@@ -1,0 +1,150 @@
+@if (wide()) {
+  <div class="desk">
+    <aside class="side" aria-label="Navegação">
+      <header class="brand"><dt-logo-mark [size]="30" /><span class="brand__name">Dueto</span></header>
+
+      <nav class="nav">
+        <p class="nav__section">Biblioteca</p>
+        <button type="button" class="nav__item" [class.nav__item--active]="store.kind() === 'static'" (click)="store.setKind('static')"
+          [attr.aria-current]="store.kind() === 'static' ? 'page' : null">
+          <dt-icon name="grid" />
+          <span class="nav__label">Catálogo</span>
+          <span class="nav__count">{{ store.staticCount() }}</span>
+        </button>
+
+        <p class="nav__section nav__section--spaced">Desktop</p>
+        <button type="button" class="nav__item" [class.nav__item--active]="store.kind() === 'animated'" (click)="store.setKind('animated')"
+          [attr.aria-current]="store.kind() === 'animated' ? 'page' : null">
+          <dt-icon name="play" />
+          <span class="nav__label">Animados</span>
+          <span class="nav__badge">PC</span>
+        </button>
+      </nav>
+
+      <section class="pair-card" aria-label="Seu par">
+        <div class="pair-card__head">
+          <span class="dot" [class.dot--off]="!store.partnerConnected()"></span>
+          <span class="pair-card__title">{{ store.partnerConnected() ? 'Par ativo' : 'Aguardando o par' }}</span>
+        </div>
+        <div class="pair-card__devices">
+          <span class="pair-card__device"><span class="pair-card__icon"><dt-icon name="monitor" [size]="14" /></span>{{ selfName() }}</span>
+          <dt-icon name="arrow" [size]="16" [stroke]="1.6" class="pair-card__arrow" />
+          <span class="pair-card__device pair-card__device--end">{{ partnerLabel() }}<span class="pair-card__icon pair-card__icon--phone"><dt-icon name="phone" [size]="14" /></span></span>
+        </div>
+      </section>
+    </aside>
+
+    <main class="main">
+      <header class="toolbar">
+        <div class="toolbar__title">
+          <h1 class="heading">{{ store.kind() === 'animated' ? 'Animados' : 'Catálogo' }}</h1>
+          <p class="muted">{{ store.visible().length }} {{ store.visible().length === 1 ? 'papel autoral' : 'papéis autorais' }}</p>
+        </div>
+        <label class="search">
+          <dt-icon name="search" [size]="15" />
+          <span class="sr-only">Buscar wallpapers</span>
+          <input type="search" placeholder="Buscar" [value]="store.query()" (input)="onSearch($event)" />
+        </label>
+        <div class="segmented" role="tablist" aria-label="Tipo de wallpaper">
+          <button type="button" role="tab" class="segmented__item" [class.segmented__item--on]="store.kind() === 'static'"
+            [attr.aria-selected]="store.kind() === 'static'" (click)="store.setKind('static')">Estáticos</button>
+          <button type="button" role="tab" class="segmented__item" [class.segmented__item--on]="store.kind() === 'animated'"
+            [attr.aria-selected]="store.kind() === 'animated'" (click)="store.setKind('animated')">Animados</button>
+        </div>
+      </header>
+
+      <ng-container *ngTemplateOutlet="content" />
+    </main>
+  </div>
+} @else {
+  <main class="phone">
+    <header class="phone__head">
+      <dt-logo-mark [size]="26" /><span class="brand__name">Dueto</span>
+      <span class="status" [class.status--off]="!store.partnerConnected()">
+        <span class="dot" [class.dot--off]="!store.partnerConnected()"></span>{{ store.partnerConnected() ? 'Conectado' : 'Aguardando o par' }}
+      </span>
+    </header>
+
+    <label class="search search--phone">
+      <dt-icon name="search" [size]="15" />
+      <span class="sr-only">Buscar wallpapers</span>
+      <input type="search" placeholder="Buscar" [value]="store.query()" (input)="onSearch($event)" />
+    </label>
+
+    <ng-container *ngTemplateOutlet="content" />
+  </main>
+}
+
+<ng-template #content>
+  @switch (store.status()) {
+    @case ('loading') {
+      <div class="placeholder" role="status"><span class="spinner"></span>Carregando o catálogo…</div>
+    }
+    @case ('error') {
+      <div class="placeholder" role="alert">
+        <p>Não foi possível carregar o catálogo.</p>
+        <button type="button" class="btn-ghost" (click)="store.load()"><dt-icon name="refresh" [size]="15" />Tentar de novo</button>
+      </div>
+    }
+    @default {
+      @if (store.featured(); as featured) {
+        <section class="hero" [class.hero--phone]="!wide()" aria-labelledby="hero-title">
+          <dt-wallpaper-thumb class="hero__art" [wallpaperId]="featured.id" [src]="featured.thumbnailUrl" />
+          <div class="hero__glow"></div>
+          <span class="chip">
+            @if (store.featuredIsCurrent()) {
+              <span class="chip__dot"></span>Agora no seu par
+            } @else {
+              <dt-icon name="eye" [size]="12" />Prévia
+            }
+          </span>
+          <div class="hero__bottom">
+            <div class="hero__text">
+              <h2 id="hero-title" class="hero__title">{{ featured.title }}</h2>
+              <p class="hero__caption">{{ featuredCaption() }}</p>
+            </div>
+            @if (!store.featuredIsCurrent()) {
+              <button type="button" class="btn-set" [class.btn-set--wide]="!wide()" (click)="store.setFeatured()" [disabled]="store.setting()">
+                <dt-icon name="check" [size]="16" [stroke]="2.6" />{{ store.setting() ? 'Definindo…' : 'Definir wallpaper' }}
+              </button>
+            }
+          </div>
+        </section>
+        @if (store.setError(); as message) {
+          <p class="set-error" role="alert"><dt-icon name="warning" [size]="16" />{{ message }}</p>
+        }
+      }
+
+      <div class="section-head">
+        <h2 class="section-title">{{ store.query() ? 'Resultados' : 'Em destaque' }}</h2>
+      </div>
+
+      @if (store.visible().length === 0) {
+        <p class="empty">
+          {{ store.query() ? 'Nenhum wallpaper encontrado para “' + store.query() + '”.' : 'Nenhum wallpaper por aqui ainda.' }}
+        </p>
+      } @else {
+        <ul class="grid" [class.grid--phone]="!wide()">
+          @for (wallpaper of store.visible(); track wallpaper.id) {
+            <li>
+              <button type="button" class="tile" [class.tile--selected]="featuredId() === wallpaper.id" (click)="store.select(wallpaper.id)"
+                [attr.aria-pressed]="featuredId() === wallpaper.id">
+                <span class="tile__art">
+                  <dt-wallpaper-thumb class="tile__thumb" [wallpaperId]="wallpaper.id" [src]="wallpaper.thumbnailUrl" />
+                  @if (wallpaper.kind === 'animated') {
+                    <span class="tile__badge"><dt-icon name="play" [size]="9" [stroke]="0" />Animado</span>
+                  }
+                  @if (store.state()?.wallpaperId === wallpaper.id) {
+                    <span class="tile__current"><dt-icon name="check" [size]="11" [stroke]="3" /><span class="sr-only">Atual</span></span>
+                  }
+                </span>
+                <span class="tile__title">{{ wallpaper.title }}</span>
+                <span class="tile__meta">{{ subtitle(wallpaper) }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    }
+  }
+</ng-template>

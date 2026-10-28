@@ -49,3 +49,31 @@ jobs:
           push: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  web:
+    name: Web (lint + test + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .tool-versions
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npx ng lint
+
+      - name: Test
+        run: npx ng test --watch=false
+
+      # O build de produção aplica os limites de tamanho (budgets) e gera o service worker.
+      - name: Build
+        run: npx ng build
