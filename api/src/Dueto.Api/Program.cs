@@ -42,6 +42,7 @@ app.MapHealthEndpoints();
 app.MapWallpaperEndpoints();
 app.MapPairingEndpoints();
 app.MapStateEndpoints();
+app.MapPushEndpoints();
 app.MapHub<SyncHub>(SyncHub.Path);
 
 app.Run();

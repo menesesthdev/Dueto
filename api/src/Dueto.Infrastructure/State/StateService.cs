@@ -1,9 +1,11 @@
 using Dueto.Core.Domain;
 using Dueto.Core.Pairing;
+using Dueto.Core.Push;
 using Dueto.Core.State;
 using Dueto.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Dueto.Infrastructure.State;
 
@@ -11,6 +13,9 @@ internal sealed class StateService(
     DuetoDbContext db,
     TimeProvider timeProvider,
     IStateNotifier notifier,
+    IPushSender pushSender,
+    IPushDispatcher pushDispatcher,
+    IOptions<PushOptions> pushOptions,
     ILogger<StateService> logger) : IStateService
 {
     public async Task<StateSnapshot> GetAsync(DeviceIdentity identity, CancellationToken cancellationToken)
@@ -55,6 +60,7 @@ internal sealed class StateService(
 
         var now = timeProvider.GetUtcNow();
         long version;
+        IReadOnlyList<Guid> mobileDeviceIds = [];
 
         await using (var transaction = await db.Database.BeginTransactionAsync(cancellationToken))
         {
@@ -88,10 +94,32 @@ internal sealed class StateService(
                 await UpsertAppliedAsync(identity.DeviceId, wallpaperId, version, now, cancellationToken);
             }
 
+            // Uma versão nova cancela os lembretes pendentes das versões anteriores do par inteiro.
+            await db.Reminders
+                .Where(r => r.Status == ReminderStatus.Pending
+                    && r.Version < version
+                    && db.Devices.Any(d => d.Id == r.DeviceId && d.PairId == identity.PairId))
+                .ExecuteUpdateAsync(s => s.SetProperty(r => r.Status, ReminderStatus.Cancelled), cancellationToken);
+
+            // Só a troca vinda do desktop gera push e lembretes: na vinda do celular o usuário
+            // já está com o aparelho na mão, e o banner de pendência cobre o resto.
+            if (identity.Kind == DeviceKind.Desktop && pushSender.IsEnabled)
+            {
+                mobileDeviceIds = await db.Devices
+                    .AsNoTracking()
+                    .Where(d => d.PairId == identity.PairId && d.Kind == DeviceKind.Mobile)
+                    .Select(d => d.Id)
+                    .ToListAsync(cancellationToken);
+
+                ScheduleReminders(mobileDeviceIds, version, now);
+                await db.SaveChangesAsync(cancellationToken);
+            }
+
             await transaction.CommitAsync(cancellationToken);
         }
 
         await NotifyOthersAsync(identity, wallpaperId, version, cancellationToken);
+        await PushToMobilesAsync(mobileDeviceIds, wallpaperId, version, cancellationToken);
 
         return new SetStateResult(SetStateStatus.Success, version);
     }
@@ -125,6 +153,11 @@ internal sealed class StateService(
 
         await UpsertAppliedAsync(identity.DeviceId, wallpaperId, version, timeProvider.GetUtcNow(), cancellationToken);
 
+        // Confirmação cancela os lembretes que sobraram desta versão (e de qualquer anterior).
+        await db.Reminders
+            .Where(r => r.DeviceId == identity.DeviceId && r.Status == ReminderStatus.Pending && r.Version <= version)
+            .ExecuteUpdateAsync(s => s.SetProperty(r => r.Status, ReminderStatus.Cancelled), cancellationToken);
+
         return ApplyStatus.Success;
     }
 
@@ -150,6 +183,47 @@ internal sealed class StateService(
             WHERE device_applied.version < EXCLUDED.version
             """,
             cancellationToken);
+    }
+
+    private void ScheduleReminders(IEnumerable<Guid> deviceIds, long version, DateTimeOffset now)
+    {
+        var delays = pushOptions.Value.EffectiveReminderDelaysMinutes;
+
+        foreach (var deviceId in deviceIds)
+        {
+            for (var index = 0; index < delays.Count; index++)
+            {
+                db.Reminders.Add(new Reminder
+                {
+                    Id = Guid.NewGuid(),
+                    DeviceId = deviceId,
+                    Version = version,
+                    Sequence = index + 1,
+                    DueAt = now.AddMinutes(delays[index]),
+                    Status = ReminderStatus.Pending,
+                });
+            }
+        }
+    }
+
+    private async Task PushToMobilesAsync(
+        IReadOnlyList<Guid> mobileDeviceIds,
+        string wallpaperId,
+        long version,
+        CancellationToken cancellationToken)
+    {
+        foreach (var deviceId in mobileDeviceIds)
+        {
+            try
+            {
+                await pushDispatcher.SendToDeviceAsync(deviceId, new PushPayload(wallpaperId, version), cancellationToken);
+            }
+            catch (Exception exception) when (exception is not OperationCanceledException)
+            {
+                // O estado e os lembretes já estão no banco: uma falha aqui é recuperada pelo próximo lembrete.
+                logger.LogWarning(exception, "Failed to send the initial push for version {Version}.", version);
+            }
+        }
     }
 
     private async Task NotifyOthersAsync(

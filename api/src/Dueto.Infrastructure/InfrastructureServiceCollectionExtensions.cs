@@ -1,9 +1,11 @@
 using Dueto.Core.Catalog;
 using Dueto.Core.Pairing;
+using Dueto.Core.Push;
 using Dueto.Core.State;
 using Dueto.Infrastructure.Catalog;
 using Dueto.Infrastructure.Pairing;
 using Dueto.Infrastructure.Persistence;
+using Dueto.Infrastructure.Push;
 using Dueto.Infrastructure.State;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -37,10 +39,23 @@ public static class InfrastructureServiceCollectionExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services
+            .AddOptions<PushOptions>()
+            .Bind(configuration.GetSection(PushOptions.SectionName))
+            .ValidateDataAnnotations()
+            .Validate(o => o.Validate() is null, "Invalid Push configuration. See Push:* settings.")
+            .ValidateOnStart();
+
         services.AddScoped<IWallpaperCatalog, WallpaperCatalog>();
         services.AddScoped<IPairingService, PairingService>();
         services.AddScoped<IDeviceAuthenticator, DeviceAuthenticator>();
         services.AddScoped<IStateService, StateService>();
+
+        services.AddSingleton<IPushSender, WebPushSender>();
+        services.AddScoped<IPushDispatcher, PushDispatcher>();
+        services.AddScoped<IPushSubscriptionService, PushSubscriptionService>();
+        services.AddScoped<IReminderProcessor, ReminderProcessor>();
+        services.AddHostedService<ReminderScheduler>();
 
         return services;
     }

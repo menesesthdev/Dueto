@@ -144,6 +144,7 @@ Regra: **o estado dos lembretes vive no banco**, nunca só em memória, para sob
 | `PUT /api/state` | sim | Define o wallpaper: `{ wallpaperId }`. Devolve a nova `version` |
 | `POST /api/state/applied` | sim | Dispositivo confirma `{ wallpaperId, version }`. Cancela lembretes |
 | `POST /api/push/subscriptions` e `DELETE` | sim (mobile) | Registra ou remove a assinatura Web Push |
+| `GET /api/push/vapid-public-key` | não | Chave pública VAPID, que o PWA usa em `PushManager.subscribe`. `503` se o Web Push não estiver configurado |
 | `GET /health` | não | Saúde do serviço |
 
 - Autenticação: `Authorization: Bearer <deviceToken>`. Token aleatório de 256 bits; no banco fica só o **hash**.

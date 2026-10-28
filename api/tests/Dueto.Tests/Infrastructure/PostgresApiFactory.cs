@@ -1,3 +1,4 @@
+using Dueto.Core.Push;
 using Dueto.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -22,6 +23,8 @@ public sealed class PostgresApiFactory : WebApplicationFactory<Program>, IAsyncL
 
     public TestClock Clock { get; } = new();
 
+    public FakePushSender PushSender { get; } = new();
+
     public async Task InitializeAsync()
     {
         await _postgres.StartAsync();
@@ -44,6 +47,9 @@ public sealed class PostgresApiFactory : WebApplicationFactory<Program>, IAsyncL
                 ["RateLimiting:PublicPermitLimit"] = "10000",
                 ["RateLimiting:PairingPermitLimit"] = "1000",
                 ["RateLimiting:PairingCompleteGlobalPermitLimit"] = "10000",
+
+                // Os testes disparam o processador de lembretes à mão; o agendador de fundo fica quase parado.
+                ["Push:SchedulerIntervalSeconds"] = "3600",
             });
         });
         return base.CreateHost(builder);
@@ -54,6 +60,9 @@ public sealed class PostgresApiFactory : WebApplicationFactory<Program>, IAsyncL
         {
             services.RemoveAll<TimeProvider>();
             services.AddSingleton<TimeProvider>(Clock);
+
+            services.RemoveAll<IPushSender>();
+            services.AddSingleton<IPushSender>(PushSender);
         });
 
     async Task IAsyncLifetime.DisposeAsync()
