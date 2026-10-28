@@ -246,6 +246,10 @@ Toda mudança nessas regras exige teste automatizado.
 - Postgres ajustado para pouca memória: `max_connections` baixo e `shared_buffers` pequeno.
 - Imagens sempre versionadas por tag do GHCR; nada de `latest` em produção sem necessidade.
 - Backup: `pg_dump` diário agendado e cópia **fora do servidor**. Teste a restauração pelo menos uma vez.
+- Backup: `infra/backup/backup.sh` (dump verificado, rotação, cópia externa via `rclone` para um destino gratuito à escolha do dono) e `infra/backup/restore.sh` (restaura num banco de verificação; sobrescrever o banco real exige `CONFIRM_OVERWRITE=yes`).
+- A imagem da API não tem o SDK, então ela aplica as migrations ao iniciar quando `Database__MigrateOnStartup=true` (ligado só no compose de produção; pensado para uma única instância).
+- Atrás do Caddy, a API só confia no `X-Forwarded-For` vindo da sub-rede fixa do compose (`ForwardedHeaders__KnownNetworks__0`). Sem isso o rate limit por IP trata todos como um só.
+- Guia de deploy: `infra/README.md`.
 
 ---
 

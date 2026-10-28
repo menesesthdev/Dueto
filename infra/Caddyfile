@@ -1,0 +1,37 @@
+# Caddy: HTTPS automático (Let's Encrypt), API e hub por proxy reverso, front estático.
+# O domínio vem de DUETO_DOMAIN. O Caddy também redireciona HTTP para HTTPS sozinho.
+{$DUETO_DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	# O Caddy sobrescreve o X-Forwarded-For com o IP real da conexão (não repassa o que o cliente mandou),
+	# e a API só confia nesse cabeçalho vindo da rede do Caddy.
+	handle /api/* {
+		reverse_proxy api:8080
+	}
+
+	# WebSocket do SignalR (wss://). O flush imediato mantém os eventos em tempo real.
+	handle /hub/* {
+		reverse_proxy api:8080 {
+			flush_interval -1
+		}
+	}
+
+	handle /health {
+		reverse_proxy api:8080
+	}
+
+	# PWA (Angular): qualquer rota que não seja arquivo cai no index.html.
+	handle {
+		root * /srv/web
+		try_files {path} /index.html
+		file_server
+	}
+}

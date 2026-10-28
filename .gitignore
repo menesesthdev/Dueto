@@ -28,3 +28,6 @@ appsettings.*.local.json
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Deploy: Angular compilado copiado para o servidor (não versionado)
+infra/web/

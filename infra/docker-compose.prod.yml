@@ -1,0 +1,108 @@
+# Produção na EC2 (1 GB de RAM): caddy (HTTPS) + api + db.
+# Nada é compilado aqui: a imagem da API vem do GHCR (publicada pelo GitHub Actions). O servidor só faz pull e up.
+#
+# Uso (na pasta infra/, com o arquivo .env preenchido a partir de .env.example):
+#   docker compose -f docker-compose.prod.yml pull
+#   docker compose -f docker-compose.prod.yml up -d
+name: dueto
+
+services:
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DUETO_DOMAIN: ${DUETO_DOMAIN:?defina DUETO_DOMAIN no .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Angular compilado (apps/web/dist/...), copiado para este diretório no deploy.
+      - ${WEB_ROOT:-./web}:/srv/web:ro
+      # Certificados do Let's Encrypt: sem este volume, cada reinício pediria certificados novos e estouraria o limite.
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:2019/config/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    mem_limit: 64m
+    logging: &logging
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - dueto
+
+  api:
+    image: ghcr.io/${GHCR_OWNER:?defina GHCR_OWNER no .env}/dueto-api:${API_TAG:?defina API_TAG no .env (tag versionada, nunca latest)}
+    restart: unless-stopped
+    # Sem "ports": a API só é alcançável pelo Caddy, pela rede interna.
+    environment:
+      Database__ConnectionString: Host=db;Port=5432;Database=${POSTGRES_DB:-dueto};Username=${POSTGRES_USER:-dueto};Password=${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+      # A imagem não tem o SDK (dotnet ef), então a API aplica as migrations ao iniciar.
+      Database__MigrateOnStartup: "true"
+      # CORS: só o domínio do PWA.
+      Cors__AllowedOrigins__0: https://${DUETO_DOMAIN}
+      # O Caddy está nesta rede: só dela a API aceita o X-Forwarded-For (IP real do cliente para o rate limit).
+      ForwardedHeaders__KnownNetworks__0: ${DUETO_SUBNET:-172.30.0.0/24}
+      # Web Push. Vazio = recurso desligado.
+      Push__VapidPublicKey: ${PUSH_VAPID_PUBLIC_KEY:-}
+      Push__VapidPrivateKey: ${PUSH_VAPID_PRIVATE_KEY:-}
+      Push__VapidSubject: ${PUSH_VAPID_SUBJECT:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    mem_limit: 300m
+    logging: *logging
+    networks:
+      - dueto
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    # Sem "ports": o banco não é publicado; só a API o acessa pela rede interna.
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dueto}
+      POSTGRES_USER: ${POSTGRES_USER:-dueto}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Postgres enxuto para pouca memória.
+    command:
+      - postgres
+      - "-c"
+      - "max_connections=20"
+      - "-c"
+      - "shared_buffers=64MB"
+      - "-c"
+      - "work_mem=4MB"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    mem_limit: 256m
+    logging: *logging
+    networks:
+      - dueto
+
+networks:
+  dueto:
+    # Sub-rede fixa: a API precisa saber de qual faixa confiar no X-Forwarded-For.
+    ipam:
+      config:
+        - subnet: ${DUETO_SUBNET:-172.30.0.0/24}
+
+volumes:
+  pgdata:
+    name: dueto_pgdata
+  caddy_data:
+    name: dueto_caddy_data
+  caddy_config:
+    name: dueto_caddy_config

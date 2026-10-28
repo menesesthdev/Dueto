@@ -59,4 +59,17 @@ public static class InfrastructureServiceCollectionExtensions
 
         return services;
     }
+
+    /// <summary>Aplica as migrations pendentes se <c>Database:MigrateOnStartup</c> estiver ligado.</summary>
+    public static async Task ApplyMigrationsIfEnabledAsync(this IServiceProvider services, CancellationToken cancellationToken = default)
+    {
+        if (!services.GetRequiredService<IOptions<DatabaseOptions>>().Value.MigrateOnStartup)
+        {
+            return;
+        }
+
+        await using var scope = services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<DuetoDbContext>();
+        await db.Database.MigrateAsync(cancellationToken);
+    }
 }

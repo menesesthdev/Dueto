@@ -30,6 +30,9 @@ builder.Services.AddScoped<IStateNotifier, SignalRStateNotifier>();
 
 var app = builder.Build();
 
+await app.Services.ApplyMigrationsIfEnabledAsync();
+
+app.UseForwardedHeaders();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 

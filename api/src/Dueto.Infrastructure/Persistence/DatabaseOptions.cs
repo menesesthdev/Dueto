@@ -12,4 +12,10 @@ public sealed class DatabaseOptions
 
     [Required(AllowEmptyStrings = false)]
     public string ConnectionString { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Aplica as migrations pendentes ao iniciar. Desligado por padrão; em produção a imagem não tem o SDK
+    /// (<c>dotnet ef</c>), então o compose liga com <c>Database__MigrateOnStartup=true</c>. Pensado para uma única instância.
+    /// </summary>
+    public bool MigrateOnStartup { get; set; }
 }

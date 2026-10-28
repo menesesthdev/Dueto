@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 
@@ -26,6 +27,35 @@ public static class SecurityServiceCollectionExtensions
             .Bind(configuration.GetSection(RateLimitingOptions.SectionName))
             .ValidateDataAnnotations()
             .ValidateOnStart();
+
+        services
+            .AddOptions<ForwardedHeadersSettings>()
+            .Bind(configuration.GetSection(ForwardedHeadersSettings.SectionName))
+            .Validate(
+                o => o.KnownNetworks.All(ForwardedHeadersSettings.IsValidNetwork),
+                "ForwardedHeaders:KnownNetworks must contain CIDR networks like 172.30.0.0/24.")
+            .ValidateOnStart();
+
+        services.AddOptions<ForwardedHeadersOptions>()
+            .Configure<IOptions<ForwardedHeadersSettings>>((forwarded, settings) =>
+            {
+                var networks = settings.Value.KnownNetworks;
+
+                // Sem redes configuradas o middleware não faz nada. Com redes, só elas são confiáveis:
+                // as listas padrão (loopback) são limpas para a regra ficar explícita.
+                forwarded.ForwardedHeaders = networks.Length > 0
+                    ? ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+                    : ForwardedHeaders.None;
+                forwarded.KnownProxies.Clear();
+                forwarded.KnownIPNetworks.Clear();
+                foreach (var network in networks)
+                {
+                    forwarded.KnownIPNetworks.Add(System.Net.IPNetwork.Parse(network));
+                }
+
+                // Um único proxy (o Caddy) entre a internet e a API.
+                forwarded.ForwardLimit = 1;
+            });
 
         services.AddCors();
         services.AddOptions<CorsOptions>()

@@ -1,0 +1,67 @@
+name: Publish API image
+
+# Publica a imagem no GHCR só a partir da main ou de uma tag v* (CLAUDE.md §17).
+# O servidor nunca compila: ele só faz pull da tag publicada aqui.
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  verify:
+    name: Verify (build + test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Build (warnings as errors)
+        run: dotnet build api/Dueto.slnx -c Release -warnaserror
+
+      # Uma tag v* pode apontar para um commit que nunca passou pelo CI: nada é publicado sem testes.
+      - name: Test
+        run: dotnet test api/Dueto.slnx --no-build -c Release
+
+  publish:
+    name: Build and push image
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/dueto-api
+          # Sempre uma tag versionada (sha-abc1234 ou v1.2.3). Nunca "latest" em produção.
+          flavor: latest=false
+          tags: |
+            type=sha,format=short
+            type=ref,event=tag
+
+      - name: Build and push (amd64 + arm64)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./api
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
