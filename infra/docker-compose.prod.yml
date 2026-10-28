@@ -47,6 +47,8 @@ services:
       Database__ConnectionString: Host=db;Port=5432;Database=${POSTGRES_DB:-dueto};Username=${POSTGRES_USER:-dueto};Password=${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
       # A imagem não tem o SDK (dotnet ef), então a API aplica as migrations ao iniciar.
       Database__MigrateOnStartup: "true"
+      # Catálogo real: o arquivo é importado a cada subida (upsert). Um catálogo inválido impede a API de subir.
+      Catalog__ImportFile: /data/catalog.json
       # CORS: só o domínio do PWA.
       Cors__AllowedOrigins__0: https://${DUETO_DOMAIN}
       # O Caddy está nesta rede: só dela a API aceita o X-Forwarded-For (IP real do cliente para o rate limit).
@@ -55,6 +57,8 @@ services:
       Push__VapidPublicKey: ${PUSH_VAPID_PUBLIC_KEY:-}
       Push__VapidPrivateKey: ${PUSH_VAPID_PRIVATE_KEY:-}
       Push__VapidSubject: ${PUSH_VAPID_SUBJECT:-}
+    volumes:
+      - ${CATALOG_FILE:-./catalog.json}:/data/catalog.json:ro
     depends_on:
       db:
         condition: service_healthy

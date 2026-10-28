@@ -21,52 +21,5 @@ internal sealed class WallpaperConfiguration : IEntityTypeConfiguration<Wallpape
         builder.Property(w => w.ThumbnailUrl).HasColumnName("thumbnail_url");
         builder.Property(w => w.Tags).HasColumnName("tags");
         builder.Property(w => w.CreatedAt).HasColumnName("created_at");
-
-        builder.HasData(SampleWallpapers());
     }
-
-    // Dados fictícios só para destravar o desenvolvimento: URLs example.com e
-    // checksums de mentira. O catálogo real substitui isto (Releases do GitHub).
-    private static Wallpaper[] SampleWallpapers() =>
-    [
-        new()
-        {
-            Id = "aurora-dunes",
-            Title = "Aurora Dunes",
-            Kind = WallpaperKind.Static,
-            DesktopUrl = "https://example.com/wallpapers/aurora-dunes-desktop.png",
-            DesktopSha256 = new string('a', 64),
-            MobileUrl = "https://example.com/wallpapers/aurora-dunes-mobile.png",
-            MobileSha256 = new string('b', 64),
-            ThumbnailUrl = "https://example.com/wallpapers/aurora-dunes-thumb.jpg",
-            Tags = ["landscape", "dark"],
-            CreatedAt = new DateTimeOffset(2026, 10, 1, 12, 0, 0, TimeSpan.Zero),
-        },
-        new()
-        {
-            Id = "neon-tide",
-            Title = "Neon Tide",
-            Kind = WallpaperKind.Static,
-            DesktopUrl = "https://example.com/wallpapers/neon-tide-desktop.png",
-            DesktopSha256 = new string('c', 64),
-            MobileUrl = "https://example.com/wallpapers/neon-tide-mobile.png",
-            MobileSha256 = new string('d', 64),
-            ThumbnailUrl = "https://example.com/wallpapers/neon-tide-thumb.jpg",
-            Tags = ["abstract", "vibrant"],
-            CreatedAt = new DateTimeOffset(2026, 10, 2, 12, 0, 0, TimeSpan.Zero),
-        },
-        new()
-        {
-            Id = "drift-loop",
-            Title = "Drift Loop",
-            Kind = WallpaperKind.Animated,
-            DesktopUrl = "https://example.com/wallpapers/drift-loop-desktop.mp4",
-            DesktopSha256 = new string('e', 64),
-            MobileUrl = null,
-            MobileSha256 = null,
-            ThumbnailUrl = "https://example.com/wallpapers/drift-loop-thumb.jpg",
-            Tags = ["animated", "calm"],
-            CreatedAt = new DateTimeOffset(2026, 10, 3, 12, 0, 0, TimeSpan.Zero),
-        },
-    ];
 }

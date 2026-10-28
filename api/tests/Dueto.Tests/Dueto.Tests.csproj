@@ -27,4 +27,10 @@
     <ProjectReference Include="..\..\src\Dueto.Api\Dueto.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestData\catalog.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- O exemplo de dev também é testado: garante que ele continua válido. -->
+    <None Include="..\..\samples\catalog.sample.json" Link="TestData\catalog.sample.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

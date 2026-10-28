@@ -46,6 +46,13 @@ public static class InfrastructureServiceCollectionExtensions
             .Validate(o => o.Validate() is null, "Invalid Push configuration. See Push:* settings.")
             .ValidateOnStart();
 
+        services
+            .AddOptions<CatalogOptions>()
+            .Bind(configuration.GetSection(CatalogOptions.SectionName))
+            .Validate(o => o.Validate() is null, "Invalid Catalog configuration. See Catalog:* settings.")
+            .ValidateOnStart();
+
+        services.AddScoped<CatalogImporter>();
         services.AddScoped<IWallpaperCatalog, WallpaperCatalog>();
         services.AddScoped<IPairingService, PairingService>();
         services.AddScoped<IDeviceAuthenticator, DeviceAuthenticator>();
@@ -71,5 +78,12 @@ public static class InfrastructureServiceCollectionExtensions
         await using var scope = services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<DuetoDbContext>();
         await db.Database.MigrateAsync(cancellationToken);
+    }
+
+    /// <summary>Importa o catalog.json se <c>Catalog:ImportFile</c> estiver configurado. Falha alto se o arquivo for inválido.</summary>
+    public static async Task ImportCatalogIfConfiguredAsync(this IServiceProvider services, CancellationToken cancellationToken = default)
+    {
+        await using var scope = services.CreateAsyncScope();
+        await scope.ServiceProvider.GetRequiredService<CatalogImporter>().ImportAsync(cancellationToken);
     }
 }

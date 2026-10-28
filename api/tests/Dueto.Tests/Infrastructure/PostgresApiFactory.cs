@@ -1,9 +1,7 @@
 using Dueto.Core.Push;
-using Dueto.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -29,10 +27,8 @@ public sealed class PostgresApiFactory : WebApplicationFactory<Program>, IAsyncL
     {
         await _postgres.StartAsync();
 
-        // Aplica as migrations antes de qualquer request.
-        using var scope = Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<DuetoDbContext>();
-        await db.Database.MigrateAsync();
+        // Acessar Services inicia a API, que aplica as migrations e importa o catálogo (veja CreateHost).
+        _ = Services;
     }
 
     protected override IHost CreateHost(IHostBuilder builder)
@@ -42,6 +38,11 @@ public sealed class PostgresApiFactory : WebApplicationFactory<Program>, IAsyncL
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Database:ConnectionString"] = _postgres.GetConnectionString(),
+                ["Database:MigrateOnStartup"] = "true",
+
+                // Catálogo de teste: os mesmos 3 wallpapers de exemplo (2 estáticos e 1 animado).
+                ["Catalog:ImportFile"] = Path.Combine(AppContext.BaseDirectory, "TestData", "catalog.json"),
+                ["Catalog:AllowedHosts:0"] = "example.com",
 
                 // Os testes fazem muitas chamadas do mesmo "IP"; limites altos para não interferirem.
                 ["RateLimiting:PublicPermitLimit"] = "10000",

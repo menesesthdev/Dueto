@@ -13,7 +13,7 @@ public class SyncHubTests(PostgresApiFactory factory)
     private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(10);
 
     /// <summary>Conexão de teste que guarda os eventos StateChanged recebidos.</summary>
-    private sealed class HubClient : IAsyncDisposable
+    internal sealed class HubClient : IAsyncDisposable
     {
         public HubConnection Connection { get; }
         public ConcurrentQueue<StateChangedMessage> Received { get; } = new();

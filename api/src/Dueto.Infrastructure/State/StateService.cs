@@ -53,9 +53,16 @@ internal sealed class StateService(
         string wallpaperId,
         CancellationToken cancellationToken)
     {
-        if (!await db.Wallpapers.AnyAsync(w => w.Id == wallpaperId, cancellationToken))
+        var kind = await WallpaperKindOf(wallpaperId, cancellationToken);
+        if (kind is null)
         {
             return new SetStateResult(SetStateStatus.WallpaperNotFound);
+        }
+
+        var isAnimated = kind == WallpaperKind.Animated;
+        if (isAnimated && identity.Kind == DeviceKind.Mobile)
+        {
+            return new SetStateResult(SetStateStatus.AnimatedNotAllowedOnMobile);
         }
 
         var now = timeProvider.GetUtcNow();
@@ -103,7 +110,9 @@ internal sealed class StateService(
 
             // Só a troca vinda do desktop gera push e lembretes: na vinda do celular o usuário
             // já está com o aparelho na mão, e o banner de pendência cobre o resto.
-            if (identity.Kind == DeviceKind.Desktop && pushSender.IsEnabled)
+            // Wallpaper animado também não gera nenhum dos dois: o celular não consegue exibi-lo,
+            // então avisar e lembrar seria pedir uma ação impossível.
+            if (identity.Kind == DeviceKind.Desktop && !isAnimated && pushSender.IsEnabled)
             {
                 mobileDeviceIds = await db.Devices
                     .AsNoTracking()
@@ -146,9 +155,15 @@ internal sealed class StateService(
             return ApplyStatus.Mismatch;
         }
 
-        if (!await db.Wallpapers.AnyAsync(w => w.Id == wallpaperId, cancellationToken))
+        var kind = await WallpaperKindOf(wallpaperId, cancellationToken);
+        if (kind is null)
         {
             return ApplyStatus.WallpaperNotFound;
+        }
+
+        if (kind == WallpaperKind.Animated && identity.Kind == DeviceKind.Mobile)
+        {
+            return ApplyStatus.AnimatedNotAllowedOnMobile;
         }
 
         await UpsertAppliedAsync(identity.DeviceId, wallpaperId, version, timeProvider.GetUtcNow(), cancellationToken);
@@ -183,6 +198,17 @@ internal sealed class StateService(
             WHERE device_applied.version < EXCLUDED.version
             """,
             cancellationToken);
+    }
+
+    private async Task<WallpaperKind?> WallpaperKindOf(string wallpaperId, CancellationToken cancellationToken)
+    {
+        var kinds = await db.Wallpapers
+            .AsNoTracking()
+            .Where(w => w.Id == wallpaperId)
+            .Select(w => (WallpaperKind?)w.Kind)
+            .ToListAsync(cancellationToken);
+
+        return kinds.Count == 0 ? null : kinds[0];
     }
 
     private void ScheduleReminders(IEnumerable<Guid> deviceIds, long version, DateTimeOffset now)

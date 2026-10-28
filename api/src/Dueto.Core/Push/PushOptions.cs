@@ -1,5 +1,6 @@
 using System.Buffers.Text;
 using System.ComponentModel.DataAnnotations;
+using Dueto.Core.Catalog;
 
 namespace Dueto.Core.Push;
 
@@ -79,7 +80,7 @@ public sealed class PushOptions
             return "Push:ReminderDelaysMinutes must have at most 10 values between 1 and 1440.";
         }
 
-        if (AllowedEndpointHosts.Any(h => string.IsNullOrWhiteSpace(h) || h.Contains('/') || h.Contains(':')))
+        if (!AllowedEndpointHosts.All(UrlAllowlist.IsBareHost))
         {
             return "Push:AllowedEndpointHosts must contain bare host names.";
         }
@@ -110,20 +111,6 @@ public sealed class PushOptions
     /// O servidor envia requisições ao endpoint que o cliente cadastra. Aceitar qualquer URL
     /// permitiria usar a API para chamar hosts internos (SSRF), então só https e hosts da allowlist.
     /// </summary>
-    public bool IsAllowedEndpoint(string? endpoint)
-    {
-        if (endpoint is null
-            || endpoint.Length > 2_048
-            || !Uri.TryCreate(endpoint, UriKind.Absolute, out var uri)
-            || uri.Scheme != Uri.UriSchemeHttps
-            || !string.IsNullOrEmpty(uri.UserInfo))
-        {
-            return false;
-        }
-
-        var host = uri.IdnHost;
-        return EffectiveAllowedEndpointHosts.Any(allowed =>
-            host.Equals(allowed, StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith("." + allowed, StringComparison.OrdinalIgnoreCase));
-    }
+    public bool IsAllowedEndpoint(string? endpoint) =>
+        UrlAllowlist.IsAllowedHttps(endpoint, EffectiveAllowedEndpointHosts);
 }

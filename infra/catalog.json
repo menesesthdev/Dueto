@@ -1,0 +1,6 @@
+{
+  // Catálogo REAL de produção. A API importa este arquivo (upsert por id) toda vez que sobe.
+  // Para adicionar ou alterar um wallpaper: edite aqui, faça o deploy e reinicie a API. Nunca remove nada sozinha.
+  // Formato e regras: veja infra/README.md (seção "Catálogo"). Exemplo completo: api/samples/catalog.sample.json
+  "wallpapers": []
+}

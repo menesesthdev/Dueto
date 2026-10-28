@@ -249,6 +249,8 @@ Toda mudança nessas regras exige teste automatizado.
 - Backup: `infra/backup/backup.sh` (dump verificado, rotação, cópia externa via `rclone` para um destino gratuito à escolha do dono) e `infra/backup/restore.sh` (restaura num banco de verificação; sobrescrever o banco real exige `CONFIRM_OVERWRITE=yes`).
 - A imagem da API não tem o SDK, então ela aplica as migrations ao iniciar quando `Database__MigrateOnStartup=true` (ligado só no compose de produção; pensado para uma única instância).
 - Atrás do Caddy, a API só confia no `X-Forwarded-For` vindo da sub-rede fixa do compose (`ForwardedHeaders__KnownNetworks__0`). Sem isso o rate limit por IP trata todos como um só.
+- O catálogo real vem de `infra/catalog.json`, importado por upsert pela API a cada subida (`Catalog__ImportFile`), com validação de slug, SHA-256, URLs `https` e hosts permitidos (`Catalog__AllowedHosts`, padrão `github.com`). Nunca remove wallpapers. Um catálogo inválido impede a API de subir. Exemplo para dev: `api/samples/catalog.sample.json`.
+- Wallpaper animado é só do desktop: o celular não pode defini-lo nem confirmá-lo (`422`), e uma troca animada vinda do desktop não gera push nem lembretes.
 - Guia de deploy: `infra/README.md`.
 
 ---

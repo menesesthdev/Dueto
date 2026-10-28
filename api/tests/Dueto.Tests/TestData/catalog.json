@@ -1,0 +1,38 @@
+{
+  "wallpapers": [
+    {
+      "id": "aurora-dunes",
+      "title": "Aurora Dunes",
+      "kind": "static",
+      "desktopUrl": "https://example.com/wallpapers/aurora-dunes-desktop.png",
+      "desktopSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "mobileUrl": "https://example.com/wallpapers/aurora-dunes-mobile.png",
+      "mobileSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "thumbnailUrl": "https://example.com/wallpapers/aurora-dunes-thumb.jpg",
+      "tags": ["landscape", "dark"],
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "neon-tide",
+      "title": "Neon Tide",
+      "kind": "static",
+      "desktopUrl": "https://example.com/wallpapers/neon-tide-desktop.png",
+      "desktopSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "mobileUrl": "https://example.com/wallpapers/neon-tide-mobile.png",
+      "mobileSha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "thumbnailUrl": "https://example.com/wallpapers/neon-tide-thumb.jpg",
+      "tags": ["abstract", "vibrant"],
+      "createdAt": "2026-10-02T12:00:00Z"
+    },
+    {
+      "id": "drift-loop",
+      "title": "Drift Loop",
+      "kind": "animated",
+      "desktopUrl": "https://example.com/wallpapers/drift-loop-desktop.mp4",
+      "desktopSha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "thumbnailUrl": "https://example.com/wallpapers/drift-loop-thumb.jpg",
+      "tags": ["animated", "calm"],
+      "createdAt": "2026-10-03T12:00:00Z"
+    }
+  ]
+}

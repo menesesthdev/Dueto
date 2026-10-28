@@ -29,9 +29,12 @@ public static class StateEndpoints
 
             var result = await state.SetAsync(user.ToDeviceIdentity(), request!.WallpaperId!, cancellationToken);
 
-            return result.Status == SetStateStatus.Success
-                ? Results.Ok(new SetStateResponse(result.Version))
-                : Results.Problem(statusCode: StatusCodes.Status404NotFound, title: "Wallpaper not found.");
+            return result.Status switch
+            {
+                SetStateStatus.Success => Results.Ok(new SetStateResponse(result.Version)),
+                SetStateStatus.AnimatedNotAllowedOnMobile => AnimatedIsDesktopOnly(),
+                _ => Results.Problem(statusCode: StatusCodes.Status404NotFound, title: "Wallpaper not found."),
+            };
         });
 
         group.MapPost("/applied", async (
@@ -57,6 +60,7 @@ public static class StateEndpoints
                 ApplyStatus.WallpaperNotFound => Results.Problem(
                     statusCode: StatusCodes.Status404NotFound,
                     title: "Wallpaper not found."),
+                ApplyStatus.AnimatedNotAllowedOnMobile => AnimatedIsDesktopOnly(),
                 ApplyStatus.Mismatch => Results.Problem(
                     statusCode: StatusCodes.Status409Conflict,
                     title: "The current version of the pair is a different wallpaper."),
@@ -69,6 +73,10 @@ public static class StateEndpoints
 
         return app;
     }
+
+    private static IResult AnimatedIsDesktopOnly() => Results.Problem(
+        statusCode: StatusCodes.Status422UnprocessableEntity,
+        title: "Animated wallpapers are available only on desktop.");
 
     private static IResult InvalidWallpaperId() => Results.Problem(
         statusCode: StatusCodes.Status400BadRequest,

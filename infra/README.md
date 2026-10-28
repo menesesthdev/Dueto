@@ -16,6 +16,7 @@ internet ──443──► Caddy ──► api:8080 ──► db:5432
 | `docker-compose.dev.yml` | Só o Postgres, para desenvolvimento |
 | `docker-compose.prod.yml` | `caddy`, `api` e `db` em produção |
 | `Caddyfile` | HTTPS automático, proxy de `/api` e `/hub` (WebSocket), SPA |
+| `catalog.json` | Catálogo real de wallpapers, importado pela API ao subir |
 | `.env.example` | Modelo das variáveis. Copie para `infra/.env` **na EC2** |
 | `backup/backup.sh` | `pg_dump` + verificação + rotação + cópia externa (rclone) |
 | `backup/restore.sh` | Restaura um dump (por padrão num banco de verificação) |
@@ -76,7 +77,46 @@ docker compose -f docker-compose.prod.yml up -d
 
 As migrations novas são aplicadas quando a API sobe (`Database__MigrateOnStartup=true`). **Faça um backup antes de atualizar.**
 
-## 4. Backup (§13)
+## 4. Catálogo de wallpapers
+
+O catálogo vem do arquivo `infra/catalog.json` (versionado no repositório). A API o importa **toda vez que sobe**:
+insere os wallpapers novos e atualiza os existentes pelo `id`. **Ela nunca remove nada**: um par pode estar apontando
+para um wallpaper, então retirar um é uma operação manual (SQL) e consciente.
+
+Os arquivos dos wallpapers ficam nos **Releases do GitHub** e o banco guarda só a URL e o SHA-256. Cada entrada:
+
+```json
+{
+  "id": "aurora-dunes",
+  "title": "Aurora Dunes",
+  "kind": "static",
+  "desktopUrl": "https://github.com/USUARIO/REPO/releases/download/v1/aurora-dunes-desktop.png",
+  "desktopSha256": "<64 caracteres hexadecimais>",
+  "mobileUrl": "https://github.com/USUARIO/REPO/releases/download/v1/aurora-dunes-mobile.png",
+  "mobileSha256": "<64 caracteres hexadecimais>",
+  "thumbnailUrl": "https://github.com/USUARIO/REPO/releases/download/v1/aurora-dunes-thumb.jpg",
+  "tags": ["landscape", "dark"],
+  "createdAt": "2026-10-01T12:00:00Z"
+}
+```
+
+Gere o SHA-256 no seu computador com `sha256sum arquivo.png`. As regras (a API **recusa subir** se alguma for violada, e lista todos os
+problemas de uma vez, com o caminho de cada campo):
+
+- `id`: `^[a-z0-9-]{1,64}$`, único. `kind`: `static` ou `animated`.
+- Todas as URLs: `https` e de um host permitido (padrão `github.com`; troque com `Catalog__AllowedHosts__0`).
+- `static` **exige** `mobileUrl` e `mobileSha256`. `animated` **não pode** ter (animado só existe no desktop).
+- `tags`: até 20, cada uma `^[a-z0-9-]{1,32}$`. `createdAt` obrigatório (ISO 8601). Comentários `//` são aceitos no arquivo.
+- Um campo com o nome errado (por exemplo `desktopUrI`) é erro, não é ignorado.
+
+Fluxo para adicionar um wallpaper: suba os arquivos como Release no GitHub, edite `infra/catalog.json`, faça o deploy e reinicie a API
+(`docker compose -f docker-compose.prod.yml up -d --force-recreate api`). **Conferência:** `curl https://SEU-DOMINIO/api/wallpapers`
+mostra o novo item; se a API não subir, `docker compose -f docker-compose.prod.yml logs api` lista o que está errado no arquivo.
+
+Um catálogo inválido **derruba a API** (ela fica reiniciando) até você corrigir: é de propósito, para um erro não passar em silêncio.
+Para voltar ao normal, restaure o `catalog.json` anterior (`git checkout infra/catalog.json`) e rode `up -d --force-recreate api`.
+
+## 5. Backup (§13)
 
 **Dump diário com cópia fora do servidor.** Perder a EC2 perde os backups locais, então a cópia externa importa.
 
@@ -120,7 +160,7 @@ docker compose -f docker-compose.prod.yml start api
 
 ## Pendências conhecidas
 
-- **Dados de exemplo no catálogo.** A migration `SeedSampleWallpapers` insere 3 wallpapers **fictícios** (URLs `example.com`). Como a API aplica todas as migrations na subida, eles aparecerão em produção. Antes de abrir ao público é preciso uma migration que os remova, ou carregar o catálogo real.
+- **O catálogo de produção começa vazio.** Os 3 wallpapers fictícios foram removidos por migration; preencha `infra/catalog.json` com os reais antes de abrir ao público.
 - **`apps/web` ainda não existe.** O Caddy serve a pasta `infra/web/` (vazia por enquanto): qualquer rota fora de `/api`, `/hub` e `/health` devolve 404 até o Angular ser copiado para lá.
 - **CSP** (Content-Security-Policy) ainda não foi definida; depende do front.
 - **Validação com HTTPS real e iPhone** (§19) só acontece depois do primeiro deploy.

@@ -31,6 +31,7 @@ builder.Services.AddScoped<IStateNotifier, SignalRStateNotifier>();
 var app = builder.Build();
 
 await app.Services.ApplyMigrationsIfEnabledAsync();
+await app.Services.ImportCatalogIfConfiguredAsync();
 
 app.UseForwardedHeaders();
 app.UseExceptionHandler();
