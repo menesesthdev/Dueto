@@ -125,8 +125,8 @@
         </p>
       } @else {
         <ul class="grid" [class.grid--phone]="!wide()">
-          @for (wallpaper of store.visible(); track wallpaper.id) {
-            <li>
+          @for (wallpaper of store.visible(); track wallpaper.id; let i = $index) {
+            <li [style.--tile-index]="i">
               <button type="button" class="tile" [class.tile--selected]="featuredId() === wallpaper.id" (click)="store.select(wallpaper.id)"
                 [attr.aria-pressed]="featuredId() === wallpaper.id">
                 <span class="tile__art">

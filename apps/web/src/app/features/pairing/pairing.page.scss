@@ -104,6 +104,17 @@
   background: var(--gradient-brand);
   box-shadow: var(--shadow-button);
   color: var(--color-white);
+  transition: transform var(--duration-fast) var(--ease-smooth),
+    box-shadow var(--duration-fast) var(--ease-smooth);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 20px 34px -14px rgb(10 77 140 / 45%);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.97);
+  }
 
   &:disabled {
     box-shadow: none;
@@ -116,6 +127,17 @@
   color: var(--color-navy);
   font-size: var(--text-body);
   height: 44px;
+  transition: transform var(--duration-fast) var(--ease-smooth),
+    box-shadow var(--duration-fast) var(--ease-smooth);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 10px 24px -8px rgb(0 0 0 / 35%);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.97);
+  }
 }
 
 .link {
@@ -224,6 +246,7 @@
 
 .done__body {
   align-items: center;
+  animation: fade-in var(--duration-slow) var(--ease-smooth) both;
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -258,6 +281,7 @@
 
 .done__check {
   align-items: center;
+  animation: scale-in 500ms var(--ease-smooth) 200ms both;
   background: var(--gradient-brand);
   border-radius: var(--radius-pill);
   box-shadow: 0 8px 16px -6px rgb(10 77 140 / 35%);
@@ -281,10 +305,11 @@
 }
 
 .status-pill__dot {
+  animation: pulse 2s ease-in-out infinite;
   background: var(--color-mint);
   border-radius: var(--radius-pill);
-  height: 6px;
-  width: 6px;
+  height: 7px;
+  width: 7px;
 }
 
 .pairing--wide .done {
@@ -321,9 +346,11 @@
 }
 
 .pairing--wide .generate {
-  background: rgb(255 255 255 / 86%);
-  border: 1px solid rgb(255 255 255 / 70%);
-  border-radius: var(--radius-xl);
+  animation: scale-in var(--duration-slow) var(--ease-smooth) both;
+  backdrop-filter: blur(var(--glass-blur));
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
   box-shadow: var(--shadow-window);
   flex-direction: row;
   gap: 0;
@@ -394,6 +421,7 @@
 }
 
 .code-card__dot {
+  animation: pulse 2s ease-in-out infinite;
   background: #4ef08a;
   border-radius: var(--radius-pill);
   height: 6px;
