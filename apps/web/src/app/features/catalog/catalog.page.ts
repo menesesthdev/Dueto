@@ -4,6 +4,7 @@ import type { Wallpaper } from '../../core/api/models';
 import { SessionStore } from '../../core/session/session.store';
 import { IconComponent } from '../../shared/ui/icon';
 import { LogoMarkComponent } from '../../shared/ui/logo-mark';
+import { ThemeToggleComponent } from '../../shared/ui/theme-toggle';
 import { WallpaperThumbComponent } from '../../shared/ui/wallpaper-thumb';
 import { ViewportService } from '../../shared/util/viewport.service';
 import { CatalogStore } from './catalog-store';
@@ -19,7 +20,7 @@ export function wallpaperSubtitle(wallpaper: Wallpaper): string {
 
 @Component({
   selector: 'dt-catalog-page',
-  imports: [NgTemplateOutlet, IconComponent, LogoMarkComponent, WallpaperThumbComponent],
+  imports: [NgTemplateOutlet, IconComponent, LogoMarkComponent, ThemeToggleComponent, WallpaperThumbComponent],
   providers: [CatalogStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './catalog.page.html',

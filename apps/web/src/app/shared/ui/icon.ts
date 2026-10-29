@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
-export type IconName = 'grid' | 'play' | 'monitor' | 'phone' | 'check' | 'eye' | 'search' | 'refresh' | 'warning' | 'arrow' | 'close' | 'info';
+export type IconName = 'grid' | 'play' | 'monitor' | 'phone' | 'check' | 'eye' | 'search' | 'refresh' | 'warning' | 'arrow' | 'close' | 'info' | 'sun' | 'moon' | 'system';
 
 /**
  * Ícones de traço do Dueto (24×24, traço 2). Decorativos: o significado vem do texto ao lado, então ficam
@@ -68,6 +68,18 @@ export type IconName = 'grid' | 'play' | 'monitor' | 'phone' | 'check' | 'eye' |
         @case ('info') {
           <circle cx="12" cy="12" r="9" />
           <path d="M12 11v5M12 7.8v.1" />
+        }
+        @case ('sun') {
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+        }
+        @case ('moon') {
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="none" />
+        }
+        @case ('system') {
+          <rect x="3" y="4" width="18" height="12" rx="2" />
+          <path d="M8 20h8" />
+          <circle cx="12" cy="10" r="2" fill="currentColor" stroke="none" />
         }
       }
     </svg>

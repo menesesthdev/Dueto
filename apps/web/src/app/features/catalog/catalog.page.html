@@ -32,6 +32,7 @@
           <span class="pair-card__device pair-card__device--end">{{ partnerLabel() }}<span class="pair-card__icon pair-card__icon--phone"><dt-icon name="phone" [size]="14" /></span></span>
         </div>
       </section>
+      <dt-theme-toggle />
     </aside>
 
     <main class="main">
@@ -63,6 +64,7 @@
       <span class="status" [class.status--off]="!store.partnerConnected()">
         <span class="dot" [class.dot--off]="!store.partnerConnected()"></span>{{ store.partnerConnected() ? 'Conectado' : 'Aguardando o par' }}
       </span>
+      <dt-theme-toggle />
     </header>
 
     <label class="search search--phone">

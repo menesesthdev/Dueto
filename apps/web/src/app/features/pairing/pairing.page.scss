@@ -108,7 +108,7 @@
     box-shadow var(--duration-fast) var(--ease-smooth);
 
   &:hover:not(:disabled) {
-    box-shadow: 0 20px 34px -14px rgb(10 77 140 / 45%);
+    box-shadow: 0 20px 34px -14px rgb(var(--shadow-base) / 45%);
     transform: translateY(-1px);
   }
 
@@ -122,8 +122,8 @@
 }
 
 .btn--light {
-  background: var(--color-white);
-  box-shadow: 0 6px 16px -6px rgb(0 0 0 / 30%);
+  background: var(--surface-raised);
+  box-shadow: 0 6px 16px -6px rgb(var(--shadow-base) / 30%);
   color: var(--color-navy);
   font-size: var(--text-body);
   height: 44px;
@@ -131,7 +131,7 @@
     box-shadow var(--duration-fast) var(--ease-smooth);
 
   &:hover:not(:disabled) {
-    box-shadow: 0 10px 24px -8px rgb(0 0 0 / 35%);
+    box-shadow: 0 10px 24px -8px rgb(var(--shadow-base) / 35%);
     transform: translateY(-1px);
   }
 
@@ -205,8 +205,8 @@
 
 .field__control {
   align-items: center;
-  background: var(--color-white);
-  border: 1px solid var(--color-fog-300);
+  background: var(--surface-base);
+  border: 1px solid var(--border-card);
   border-radius: var(--radius-md);
   color: var(--color-azure);
   display: flex;
@@ -264,10 +264,10 @@
 
 .done__tile {
   align-items: center;
-  background: var(--color-white);
-  border: 1px solid var(--color-fog-200);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-card);
   border-radius: 20px;
-  box-shadow: 0 10px 24px -12px rgb(10 42 74 / 14%);
+  box-shadow: 0 10px 24px -12px rgb(var(--shadow-base) / 14%);
   color: var(--color-navy);
   display: flex;
   height: 64px;
@@ -284,7 +284,7 @@
   animation: scale-in 500ms var(--ease-smooth) 200ms both;
   background: var(--gradient-brand);
   border-radius: var(--radius-pill);
-  box-shadow: 0 8px 16px -6px rgb(10 77 140 / 35%);
+  box-shadow: 0 8px 16px -6px rgb(var(--shadow-base) / 35%);
   color: var(--color-white);
   display: flex;
   height: 34px;
@@ -382,7 +382,7 @@
   background: var(--gradient-hero);
   border: 1px solid rgb(255 255 255 / 14%);
   border-radius: var(--radius-xl);
-  box-shadow: 0 24px 48px -22px rgb(10 42 74 / 55%);
+  box-shadow: 0 24px 48px -22px rgb(var(--shadow-base) / 55%);
   color: var(--color-white);
   display: flex;
   flex-direction: column;
