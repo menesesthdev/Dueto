@@ -54,7 +54,14 @@ describe('PlatformService', () => {
   });
 
   it('detects Electron through the preload bridge', () => {
-    const platform = create(WINDOWS, { dueto: { platform: 'electron' } });
+    const platform = create(WINDOWS, {
+      dueto: {
+        platform: 'electron',
+        onStateChanged: () => () => undefined,
+        onConnectionStatus: () => () => undefined,
+        getAppliedState: () => Promise.resolve({ wallpaperId: null, version: 0 }),
+      },
+    } as Partial<Window>);
 
     expect(platform.isElectron).toBe(true);
     expect(platform.deviceKind).toBe('desktop');

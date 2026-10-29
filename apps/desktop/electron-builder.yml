@@ -1,0 +1,31 @@
+appId: com.dueto.desktop
+productName: Dueto
+directories:
+  output: release
+  buildResources: resources
+files:
+  - dist/**/*
+  - node_modules/**/*
+  - package.json
+extraResources:
+  - from: ../web/dist/web/browser
+    to: web
+    filter:
+      - "**/*"
+protocols:
+  - name: Dueto
+    schemes:
+      - dueto
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Utility
+  icon: resources/icon.png
+win:
+  target:
+    - nsis
+  icon: resources/icon.png
+nsis:
+  oneClick: true
+  perMachine: false

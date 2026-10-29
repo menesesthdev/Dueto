@@ -57,6 +57,11 @@ export interface SetStateResponse {
   version: number;
 }
 
+export interface AppliedRequest {
+  wallpaperId: string;
+  version: number;
+}
+
 /** Erro no formato ProblemDetails (RFC 7807). */
 export interface ProblemDetails {
   title?: string;

@@ -12,4 +12,8 @@ export class WallpapersApi {
   list(): Observable<Wallpaper[]> {
     return this.http.get<Wallpaper[]>(`${this.base}/api/wallpapers`);
   }
+
+  get(id: string): Observable<Wallpaper> {
+    return this.http.get<Wallpaper>(`${this.base}/api/wallpapers/${encodeURIComponent(id)}`);
+  }
 }

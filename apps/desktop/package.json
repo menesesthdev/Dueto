@@ -1,0 +1,26 @@
+{
+  "name": "dueto-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/main/main.js",
+  "scripts": {
+    "start": "npm run build:main && electron .",
+    "start:dev": "npm run build:main && DUETO_DEV=1 electron .",
+    "build:main": "tsc -p tsconfig.json && tsc -p tsconfig.preload.json",
+    "build:all": "cd ../web && npm run build && cd ../desktop && npm run build:main",
+    "test": "vitest run",
+    "package": "npm run build:all && electron-builder",
+    "package:dir": "npm run build:all && electron-builder --dir"
+  },
+  "dependencies": {
+    "@microsoft/signalr": "^10.0.0",
+    "wallpaper": "^7.2.0"
+  },
+  "devDependencies": {
+    "electron": "^45.0.0",
+    "electron-builder": "^26.0.0",
+    "typescript": "~6.0.2",
+    "vitest": "^5.0.0"
+  }
+}

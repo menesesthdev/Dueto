@@ -4,6 +4,9 @@ import type { DeviceKind } from '../api/models';
 /** Ponte mínima que o preload do Electron expõe em `window.dueto` (Fase 4). Ausente no navegador. */
 export interface DuetoDesktopBridge {
   readonly platform: 'electron';
+  onStateChanged(callback: (data: { wallpaperId: string; version: number; originDeviceId?: string }) => void): () => void;
+  onConnectionStatus(callback: (connected: boolean) => void): () => void;
+  getAppliedState(): Promise<{ wallpaperId: string | null; version: number }>;
 }
 
 declare global {

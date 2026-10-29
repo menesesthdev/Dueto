@@ -77,3 +77,30 @@ jobs:
       # O build de produção aplica os limites de tamanho (budgets) e gera o service worker.
       - name: Build
         run: npx ng build
+
+  desktop:
+    name: Desktop (lint + test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/desktop
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .tool-versions
+          cache: npm
+          cache-dependency-path: apps/desktop/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npx tsc --noEmit
+
+      - name: Lint preload
+        run: npx tsc --noEmit -p tsconfig.preload.json
+
+      - name: Test
+        run: npx vitest run

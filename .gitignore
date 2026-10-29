@@ -31,3 +31,11 @@ Thumbs.db
 
 # Deploy: Angular compilado copiado para o servidor (não versionado)
 infra/web/
+
+# Electron desktop
+out/
+release/
+*.exe
+*.AppImage
+*.deb
+*.snap

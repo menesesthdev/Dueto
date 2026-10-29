@@ -16,4 +16,8 @@ export class StateApi {
   set(wallpaperId: string): Observable<SetStateResponse> {
     return this.http.put<SetStateResponse>(`${this.base}/api/state`, { wallpaperId });
   }
+
+  applied(wallpaperId: string, version: number): Observable<void> {
+    return this.http.post<void>(`${this.base}/api/state/applied`, { wallpaperId, version });
+  }
 }
